@@ -1,5 +1,5 @@
-from encoder.params_model import *
-from encoder.params_data import *
+from breaker_audio.component.encoder.params_model import *
+from breaker_audio.component.encoder.params_data import *
 from scipy.interpolate import interp1d
 from sklearn.metrics import roc_curve
 from torch.nn.utils import clip_grad_norm_
@@ -9,7 +9,7 @@ import numpy as np
 import torch
 
 
-class SpeakerEncoder(nn.Module):
+class ModelSpeaker(nn.Module):
     def __init__(self, device, loss_device):
         super().__init__()
         self.loss_device = loss_device

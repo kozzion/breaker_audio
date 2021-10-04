@@ -2,9 +2,9 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from breaker_audio.component_cmn.encoder import audio
-from breaker_audio.component_cmn.encoder.params_data import *
-from breaker_audio.component_cmn.encoder.model import SpeakerEncoder
+from breaker_audio.component.encoder import audio
+from breaker_audio.component.encoder.params_data import *
+from breaker_audio.component.encoder.model_speaker import ModelSpeaker
 
 class Encoder():
     
@@ -31,7 +31,7 @@ class Encoder():
         # TODO: I think the slow loading of the encoder might have something to do with the device it
         #   was saved on. Worth investigating.
         path_file_encoder = path_dir_model.joinpath('model.pt')
-        self._model = SpeakerEncoder(self._device, torch.device("cpu"))
+        self._model = ModelSpeaker(self._device, torch.device("cpu"))
         checkpoint = torch.load(path_file_encoder, map_location=self._device.type)
         self._model.load_state_dict(checkpoint["model_state"])
         self._model.eval()

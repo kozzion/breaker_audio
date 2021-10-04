@@ -5,7 +5,7 @@ from vocoder import inference as vocoder
 from melgan import inference as vocoder_melgan
 from pathlib import Path
 from time import perf_counter as timer
-from toolbox.utterance import Utterance
+from breaker_audio.data_structure.utterance import Utterance
 import numpy as np
 import traceback
 import sys

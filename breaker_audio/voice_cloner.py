@@ -5,9 +5,9 @@ import numpy as np
 from pathlib import Path
 
 from breaker_audio.tools_signal import ToolsSignal
-from breaker_audio.component.encoder import Encoder
-from breaker_audio.component.synthesizer import Synthesizer
-from breaker_audio.component.vocoder_wavernn import VocoderWavernn
+from breaker_audio.component.encoder.encoder import Encoder
+from breaker_audio.component.synthesizer.synthesizer import Synthesizer
+from breaker_audio.component.vocoder.vocoder_wavernn import VocoderWavernn
 
 
 from breaker_audio.component_cmn.synthesizer.inference import Synthesizer as SynthesizerCmn
