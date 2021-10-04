@@ -4,7 +4,7 @@ import librosa
 from scipy.signal import lfilter
 import soundfile as sf
 
-import breaker_audio.component_eng.vocoder.hparams as hp
+import breaker_audio.component.vocoder.hparams as hp
 
 def label_2_float(x, bits) :
     return 2 * x / (2**bits - 1.) - 1.

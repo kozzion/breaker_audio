@@ -1,7 +1,7 @@
 import torch
 
-from breaker_audio.component_eng.vocoder.models.fatchord_version import WaveRNN
-from breaker_audio.component_eng.vocoder import hparams as hp
+from breaker_audio.component.vocoder.models.fatchord_version import WaveRNN
+from breaker_audio.component.vocoder import hparams as hp
 
 _model = None   # type: WaveRNN
 

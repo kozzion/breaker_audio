@@ -6,7 +6,7 @@ import numpy as np
 import librosa
 import struct
 
-from breaker_audio.component_eng.encoder.params_data import *
+from breaker_audio.component.encoder.params_data import *
 
 try:
     import webrtcvad

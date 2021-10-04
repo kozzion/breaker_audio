@@ -5,19 +5,25 @@ import numpy as np
 from pathlib import Path
 
 from breaker_audio.tools_signal import ToolsSignal
-from breaker_audio.component_cmn.encoder_voice import EncoderVoice
+from breaker_audio.component.encoder import Encoder
+from breaker_audio.component.synthesizer import Synthesizer
+from breaker_audio.component.vocoder_wavernn import VocoderWavernn
+
+
 from breaker_audio.component_cmn.synthesizer.inference import Synthesizer as SynthesizerCmn
 from breaker_audio.component_cmn.melgan.inference import MelVocoder as MelVocoderCmn
 from breaker_audio.component_cmn.melgan.inference import get_default_device
 
-from breaker_audio.component_eng.synthesizer.inference import Synthesizer as SynthesizerEng
-from breaker_audio.component_eng.vocoder import inference as VocoderEng
+
+from breaker_audio.component.vocoder import inference as VocoderEng
 
 class VoiceClonerDefault:
 
     
     def __init__(self, path_dir_data:Path, language_code_639_3, *, low_mem=False) -> None:
         
+        self.path_dir_data = path_dir_data
+
         # check language
         self.dict_language_supported = {
             'eng':'English',
@@ -46,16 +52,16 @@ class VoiceClonerDefault:
 
         
         if self.language_code_639_3 == 'cmn':
-            path_file_model_encoder =    Path('C:\\project\\data\\data_breaker\\model\\audio_cmn_ge2e_pretrained\\model.pt')
-            path_dir_synthesizer =       Path('C:\\project\\data\\data_breaker\\model\\audio_cmn_logs_syne\\')
-            path_file_model_vocoder =    Path('C:\\project\\data\\data_breaker\\model\\audio_cmn_melgan_multi_speaker\\model.pt')
-            
+            path_dir_model_encoder =      self.path_dir_data.joinpath('model', 'audio_cmn_ge2e_pretrained')
+            path_dir_synthesizer =        self.path_dir_data.joinpath('model', 'audio_cmn_logs_syne')
+            path_file_model_vocoder =     Path('C:\\project\\data\\data_breaker\\model\\audio_cmn_melgan_multi_speaker\\model.pt')
 
 
-            self._encoder = EncoderVoice()
-            self._encoder.load_model(path_file_model_encoder, device='cpu')
+            self._encoder = Encoder(device='cpu')
+            self._encoder.load_model(path_dir_model_encoder)
  
             self._synthesizer = SynthesizerCmn(path_dir_synthesizer)
+
             self._vocoder = MelVocoderCmn(
                 path_file_model_vocoder, 
                 github=True, 
@@ -64,29 +70,29 @@ class VoiceClonerDefault:
                 mode='default')
 
         elif self.language_code_639_3 == 'eng':
-            path_file_model_encoder =     Path('C:\\project\\data\\data_breaker\\model\\audio_eng_rtv_pretrained_encoder\\model.pt')
-            path_file_model_synthesizer = Path('C:\\project\\data\\data_breaker\\model\\audio_eng_rtv_pretrained_synthesizer\\model.pt')
-            path_file_model_vocoder =     Path('C:\\project\\data\\data_breaker\\model\\audio_eng_rtv_pretrained_vocoder\\model.pt')
+            path_dir_model_encoder =     self.path_dir_data.joinpath('model', 'audio_eng_rtv_pretrained_encoder')
+            path_dir_model_synthesizer = self.path_dir_data.joinpath('model', 'audio_eng_rtv_pretrained_synthesizer')
+            path_dir_model_vocoder =     self.path_dir_data.joinpath('model', 'audio_eng_rtv_pretrained_vocoder')
 
-            self._encoder = EncoderVoice()
-            self._encoder.load_model(path_file_model_encoder)
-            self._synthesizer = SynthesizerEng(path_file_model_synthesizer)
-            VocoderEng.load_model(path_file_model_vocoder)
-
-
-        
-        elif self.language_code_639_3 == 'nld':
-            path_file_model_encoder =     Path()
-            path_file_model_synthesizer = Path()
-            path_file_model_vocoder =     Path()
-
-            self._encoder = EncoderVoice()
-            self._encoder.load_model(path_file_model_encoder)
-            self._synthesizer = SynthesizerEng(path_file_model_synthesizer)
-            VocoderEng.load_model(path_file_model_vocoder)
-
-
+            self._encoder = Encoder(device='cpu')
+            self._encoder.load_model(path_dir_model_encoder)
+            self._synthesizer = Synthesizer(device='cpu')
+            self._synthesizer.load_model(path_dir_model_synthesizer)
+            self._vocoder = VocoderWavernn(device='cpu')
+            self._vocoder.load_model(path_dir_model_vocoder)
             
+        elif self.language_code_639_3 == 'nld':
+            path_dir_model_encoder =     self.path_dir_data.joinpath('model', 'audio_nld_encoder')
+            path_dir_model_synthesizer = self.path_dir_data.joinpath('model', 'audio_nld_synthesizer')
+            path_dir_model_vocoder =     self.path_dir_data.joinpath('model', 'audio_nld_vocoder')
+
+            self._encoder = Encoder(device='cuda')
+            self._encoder.load_model(path_dir_model_encoder)
+            self._synthesizer = Synthesizer(device='cuda')
+            self._synthesizer.load_model(path_dir_model_synthesizer)
+            self._vocoder = VocoderWavernn(device='cpu')
+            self._vocoder.load_model(path_dir_model_vocoder)
+
         else:
             raise Exception('unimplemented language code: ' + self.language_code_639_3)
 
@@ -102,7 +108,7 @@ class VoiceClonerDefault:
 
         elif self.language_code_639_3 == 'eng':
             array_melspec = self._synthesizer.synthesize_spectrograms([text], [self.embeding])[0]
-            array_signal = VocoderEng.infer_waveform(array_melspec)
+            array_signal = self._vocoder.infer_waveform(array_melspec)
             array_signal, sampling_rate = ToolsSignal.preprocess_signal(array_signal, 16000)
             return array_signal, sampling_rate
         else:

@@ -1,4 +1,4 @@
-from breaker_audio.component_eng.synthesizer.hparams import hparams as _syn_hp
+from breaker_audio.component.synthesizer.hparams import hparams as _syn_hp
 
 
 # Audio settings------------------------------------------------------------------------

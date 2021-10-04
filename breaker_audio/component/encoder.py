@@ -1,6 +1,4 @@
-from matplotlib import cm
 from pathlib import Path
-import matplotlib.pyplot as plt
 import numpy as np
 import torch
 
@@ -8,14 +6,19 @@ from breaker_audio.component_cmn.encoder import audio
 from breaker_audio.component_cmn.encoder.params_data import *
 from breaker_audio.component_cmn.encoder.model import SpeakerEncoder
 
-class EncoderVoice:
+class Encoder():
     
-    def __init__(self) -> None:
-        self._model = None  # type: SpeakerEncoder
-        self._device = torch.device('cpu')  # None # type: torch.device
+    def __init__(self,  device:str) -> None:
 
+        if device is None:
+            self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        elif isinstance(device, str):
+            if not device in ['cpu', 'cuda']:
+                raise Exception('unkown device: ' + device)
+            self._device = torch.device(device)
+        self._model = None
 
-    def load_model(self, weights_fpath: Path, device=None):
+    def load_model(self, path_dir_model: Path):
         """
         Loads the model in memory. If this function is not explicitely called, it will be run on the 
         first call to embed_frames() with the default weights file.
@@ -27,15 +30,12 @@ class EncoderVoice:
         """
         # TODO: I think the slow loading of the encoder might have something to do with the device it
         #   was saved on. Worth investigating.
-        if device is None:
-            self._device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        elif isinstance(device, str):
-            self._device = torch.device(device)
+        path_file_encoder = path_dir_model.joinpath('model.pt')
         self._model = SpeakerEncoder(self._device, torch.device("cpu"))
-        checkpoint = torch.load(weights_fpath, map_location=self._device.type)
+        checkpoint = torch.load(path_file_encoder, map_location=self._device.type)
         self._model.load_state_dict(checkpoint["model_state"])
         self._model.eval()
-        print("Loaded encoder \"%s\" trained to step %d" % (weights_fpath.name, checkpoint["step"]))
+        print("Loaded encoder \"%s\" trained to step %d" % (path_file_encoder.name, checkpoint["step"]))
 
 
     def is_loaded(self):

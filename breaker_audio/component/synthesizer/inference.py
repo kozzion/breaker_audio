@@ -5,12 +5,12 @@ import numpy as np
 import librosa
 
 
-from breaker_audio.component_eng.synthesizer import audio
-from breaker_audio.component_eng.synthesizer.hparams import hparams
-from breaker_audio.component_eng.synthesizer.models.tacotron import Tacotron
-from breaker_audio.component_eng.synthesizer.utils.symbols import symbols
-from breaker_audio.component_eng.synthesizer.utils.text import text_to_sequence
-from breaker_audio.component_eng.vocoder.display import simple_table
+from breaker_audio.component.synthesizer import audio
+from breaker_audio.component.synthesizer.hparams import hparams
+from breaker_audio.component.synthesizer.models.tacotron import Tacotron
+from breaker_audio.component.synthesizer.utils.symbols import symbols
+from breaker_audio.component.synthesizer.utils.text import text_to_sequence
+from breaker_audio.component.vocoder.display import simple_table
 
 class Synthesizer:
     sample_rate = hparams.sample_rate

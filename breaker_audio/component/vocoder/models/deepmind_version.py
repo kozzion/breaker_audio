@@ -2,8 +2,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from breaker_audio.component_eng.utils.display import *
-from breaker_audio.component_eng.utils.dsp import *
+from breaker_audio.component.utils.display import *
+from breaker_audio.component.utils.dsp import *
 
 
 class WaveRNN(nn.Module) :

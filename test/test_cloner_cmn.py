@@ -21,13 +21,16 @@ path_file_voice_toclone = path_dir_data.joinpath('testdata', 'cmn_0000.mp3')
 text = "谁敢拐你跟团吧要" #speaker swallows last sylable
 
 cloner = VoiceClonerDefault(path_dir_data, 'cmn')
-signal_voice_toclone, sampling_rate = ToolsAudioIO.load_signal_wav(path_file_voice_toclone, mode_preprocessing=True)
+signal_voice_toclone, sampling_rate_toclone = ToolsAudioIO.load_signal_wav(path_file_voice_toclone, mode_preprocessing=True)
 
 
 cloner.clone_voice(signal_voice_toclone)
-signal_voice_cloned = cloner.synthesize(text)
+signal_voice_cloned, sampling_rate_cloned = cloner.synthesize(text)
 #signal_voice_cloned_aligned = ToolsSignal.align_signal_melspec_energy(signal_voice_toclone, signal_voice_cloned, cloner._vocoder)
+print(type(signal_voice_cloned))
+print(type(signal_voice_cloned[0]))
+print(type(signal_voice_cloned[1]))
 
-ToolsAudioIO.play(signal_voice_toclone, sampling_rate)
-ToolsAudioIO.play(signal_voice_cloned, sampling_rate)
+ToolsAudioIO.play(signal_voice_toclone, sampling_rate_toclone)
+ToolsAudioIO.play(signal_voice_cloned, sampling_rate_cloned)
 #ToolsAudioIO.play(signal_voice_cloned_aligned, sampling_rate)

@@ -2,9 +2,9 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from breaker_audio.component_eng.vocoder.distribution import sample_from_discretized_mix_logistic
-from breaker_audio.component_eng.vocoder.display import *
-from breaker_audio.component_eng.vocoder.audio import *
+from breaker_audio.component.vocoder.distribution import sample_from_discretized_mix_logistic
+from breaker_audio.component.vocoder.display import *
+from breaker_audio.component.vocoder.audio import *
 
 
 class ResBlock(nn.Module):
