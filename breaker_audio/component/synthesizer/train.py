@@ -135,10 +135,6 @@ def train(run_id: str, syn_dir: str, models_dir: str, save_every: int,
         model.r = r
 
         # Begin the training
-        simple_table([(f"Steps with r={r}", str(training_steps // 1000) + "k Steps"),
-                      ("Batch Size", batch_size),
-                      ("Learning Rate", lr),
-                      ("Outputs/Step (r)", model.r)])
 
         for p in optimizer.param_groups:
             p["lr"] = lr

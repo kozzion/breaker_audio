@@ -39,21 +39,14 @@ class VocoderWavernn:
     def is_loaded(self):
         return self._model is not None
 
-
-    def infer_waveform(self, mel, normalize=True,  batched=True, target=8000, overlap=800, 
-                    progress_callback=None):
-        """
-        Infers the waveform of a mel spectrogram output by the synthesizer (the format must match 
-        that of the synthesizer!)
-        
-        :param normalize:  
-        :param batched: 
-        :param target: 
-        :param overlap: 
-        :return: 
-        """
+    def ensure_loaded(self):
         if self._model is None:
             raise Exception("Please load Wave-RNN in memory before using it")
+
+    def melspec_to_signal(self, mel, normalize=True,  batched=True, target=8000, overlap=800, 
+                    progress_callback=None):
+        self.ensure_loaded()
+
         
         if normalize:
             mel = mel / hp.mel_max_abs_value

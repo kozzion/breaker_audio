@@ -5,14 +5,11 @@ from warnings import warn
 import numpy as np
 import librosa
 import struct
+import webrtcvad
 
 from breaker_audio.component.encoder.params_data import *
 
-try:
-    import webrtcvad
-except:
-    warn("Unable to import 'webrtcvad'. This package enables noise removal and is recommended.")
-    webrtcvad=None
+
 
 int16_max = (2 ** 15) - 1
 
@@ -52,6 +49,7 @@ def preprocess_wav(fpath_or_wav: Union[str, Path, np.ndarray],
 
 
 def wav_to_mel_spectrogram(wav):
+    #MARKER melspec
     """
     Derives a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform.
     Note: this not a log-mel spectrogram.

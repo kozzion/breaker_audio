@@ -9,7 +9,7 @@ import librosa
 import webrtcvad # TODO not happy with these
 import struct # TODO not happy with these
 
-from breaker_audio.component_cmn.melgan.inference import MelVocoder
+from breaker_audio.component.vocoder.vocoder_melgan import VocoderMelgan
 
 class ToolsSignal:
 
@@ -39,7 +39,7 @@ class ToolsSignal:
         return librosa.effects.time_stretch(signal_pred, speed)
 
     @staticmethod
-    def align_signal_melspec_energy(signal_true, signal_pred, vocoder:MelVocoder):
+    def align_signal_melspec_energy(signal_true, signal_pred, vocoder:VocoderMelgan):
         import torch #TODO get rid of melvocoder and use somthign like an fft
         melspec_true = vocoder.signal_to_melspec(torch.from_numpy(signal_true[None])).squeeze().cpu().numpy()
         melspec_pred = vocoder.signal_to_melspec(torch.from_numpy(signal_pred[None])).squeeze().cpu().numpy()

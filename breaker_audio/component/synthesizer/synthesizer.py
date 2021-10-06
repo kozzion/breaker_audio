@@ -54,9 +54,11 @@ class Synthesizer:
         self._model.load(path_file_model)
         self._model.eval()
 
-    def synthesize_spectrograms(self, texts: List[str],
-                                embeddings: Union[np.ndarray, List[np.ndarray]],
-                                return_alignments=False):
+    def synthesize_spectrograms(self, 
+        texts: List[str],
+        embeddings: List[np.ndarray],
+        return_alignments=False):
+        
         """
         Synthesizes mel spectrograms from texts and speaker embeddings.
 
