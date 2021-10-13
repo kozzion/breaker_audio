@@ -27,6 +27,8 @@ class ToolsAudioIO:
 
     staticmethod
     def save_wav(path_file: Path, singal:np.ndarray, sampling_rate:int=44100):
+        import soundfile as sf
+# >>> sf.write('stereo_file.wav', np.random.randn(10, 2), 44100, 'PCM_24')
         librosa.output.write_wav(path_file, singal, sampling_rate)
 
     # def load_wav(path, sample_rate) :

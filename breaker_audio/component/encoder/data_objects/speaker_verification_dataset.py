@@ -1,9 +1,12 @@
-from encoder.data_objects.random_cycler import RandomCycler
-from encoder.data_objects.speaker_batch import SpeakerBatch
-from encoder.data_objects.speaker import Speaker
-from encoder.params_data import partials_n_frames
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
+from torch.utils.data import DataLoader
 from pathlib import Path
+
+
+from breaker_audio.component.encoder.data_objects.random_cycler import RandomCycler
+from breaker_audio.component.encoder.data_objects.speaker_batch import SpeakerBatch
+from breaker_audio.component.encoder.data_objects.speaker import Speaker
+from breaker_audio.component.encoder.params_data import partials_n_frames
 
 # TODO: improve with a pool of speakers for data efficiency
 

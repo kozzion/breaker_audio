@@ -1,6 +1,8 @@
-from encoder.data_objects.random_cycler import RandomCycler
-from encoder.data_objects.utterance import Utterance
+
 from pathlib import Path
+
+from breaker_audio.component.encoder.data_objects.random_cycler import RandomCycler
+from breaker_audio.component.encoder.data_objects.utterance import Utterance
 
 # Contains the set of utterances of a single speaker
 class Speaker:
