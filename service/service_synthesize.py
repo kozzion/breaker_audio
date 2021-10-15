@@ -22,16 +22,15 @@ if __name__ == '__main__':
     config.gpu_options.allow_growth = True
     sess = tf.compat.v1.Session(config=config)
 
-    path_file_config = Path('config_aws.cfg')
-    path_dir_data = Path('C:\\project\\data\\data_breaker\\')
-
+    path_file_config = Path('config.cfg')
+    path_dir_data =  Path(os.path.join('..', '..', '..', 'data','data_breaker'))
     with path_file_config.open('r', encoding='utf-8') as file:
         dict_config = json.load(file)
 
     jsonqueue_request = Jsonqueue.from_dict(dict_config['queue_request'])
     if not jsonqueue_request.exists():
         jsonqueue_request.create()
-        
+
     dict_cloner = {}
     dict_cloner['eng'] = VoiceClonerDefault(path_dir_data, 'eng')
     dict_cloner['cmn'] = VoiceClonerDefault(path_dir_data, 'cmn')
