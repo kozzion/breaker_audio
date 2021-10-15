@@ -1,0 +1,9 @@
+RUN pip3 install -r requirements.txt
+
+# to skipcache
+RUN apt-get install 'ffmpeg'\
+    'libsm6'\
+    'libxext6'  -y
+
+# to skipcache
+ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache

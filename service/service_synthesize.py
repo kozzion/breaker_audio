@@ -7,58 +7,63 @@ import numpy as np
 from pathlib import Path
 
 import tensorflow as tf
-config = tf.compat.v1.ConfigProto()
-config.gpu_options.allow_growth = True
-sess = tf.compat.v1.Session(config=config)
 
-# from vocoder import inference as vocoder
+from breaker_core.datasource.jsonqueue import Jsonqueue
+from breaker_core.datasource.bytearraysource import Bytearraysource
 
 sys.path.append('..')
-
 from breaker_audio.voice_cloner import VoiceClonerDefault
 from breaker_audio.tools_audio_io import ToolsAudioIO
 
-
-path_dir_request = Path('C:\\project\\breaker\\breaker_discord\\request')
-path_dir_response = Path('C:\\project\\breaker\\breaker_discord\\response')
-path_dir_data = Path('C:\\project\\data\\data_breaker\\')
-
-def get_request():
-    list_name_file_request  = os.listdir(path_dir_request)
-    list_name_file_response  = os.listdir(path_dir_response)
-    for name_file_request in list_name_file_request:
-        path_file_request = path_dir_request.joinpath(name_file_request)
-        path_file_response = path_dir_response.joinpath(name_file_request[:-4] + 'wav')
-        if not  path_file_response.is_file():
-            return path_file_request, path_file_response
-    return None, None
+if __name__ == '__main__':
 
 
-dict_cloner = {}
-dict_cloner['eng'] = VoiceClonerDefault(path_dir_data, 'eng')
-dict_cloner['cmn'] = VoiceClonerDefault(path_dir_data, 'cmn')
+    config = tf.compat.v1.ConfigProto()
+    config.gpu_options.allow_growth = True
+    sess = tf.compat.v1.Session(config=config)
 
-while True:
-    path_file_request, path_file_response = get_request()
-    if path_file_request == None:
-        time.sleep(0.1)
-        print('sleep')
-        sys.stdout.flush()
-    else:
-        # with open(path_file_request, mode='r', encoding='utf-8') as file:
-        #     dict_request = json.load(file)
-        with open(path_file_request, mode='r') as file:
-            dict_request = json.load(file)
+    path_file_config = Path('config_aws.cfg')
+    path_dir_data = Path('C:\\project\\data\\data_breaker\\')
 
-        language_code_639_3 = dict_request['language_code_639_3']
-        path_file_voice_toclone = Path(dict_request['path_file_voice_toclone'])
-        text = dict_request['text']
-        if language_code_639_3 in dict_cloner:
-            cloner = dict_cloner[language_code_639_3]
+    with path_file_config.open('r', encoding='utf-8') as file:
+        dict_config = json.load(file)
 
-            signal_voice_toclone, sampling_rate_toclone = ToolsAudioIO.load_signal_wav(path_file_voice_toclone, mode_preprocessing=True)
-            cloner.clone_voice(signal_voice_toclone)
-            signal_voice_cloned, sampling_rate_cloned = cloner.synthesize(text)
-            ToolsAudioIO.save_wav(path_file_response, signal_voice_cloned, sampling_rate_cloned)
+    jsonqueue_request = Jsonqueue.from_dict(dict_config['queue_request'])
+    if not jsonqueue_request.exists():
+        jsonqueue_request.create()
+        
+    dict_cloner = {}
+    dict_cloner['eng'] = VoiceClonerDefault(path_dir_data, 'eng')
+    dict_cloner['cmn'] = VoiceClonerDefault(path_dir_data, 'cmn')
+
+    count = 0
+    while True:
+        dict_request = jsonqueue_request.dequeue()
+        count += 1
+        if dict_request == None:
+            time.sleep(0.1)
+            if count % 10 == 0:
+                print('sleep ' + str(count))
+                sys.stdout.flush()
         else:
-            ToolsAudioIO.save_wav(path_file_response, np.zeros(1000), 1000)
+            print('request!')
+            sys.stdout.flush()
+
+            language_code_639_3 = dict_request['language_code_639_3']
+            bytearraysource_voice = Bytearraysource.from_dict(dict_request['bytearraysource_voice'])
+            text = dict_request['text']
+            bytearraysource_output = Bytearraysource.from_dict(dict_request['bytearraysource_output'])
+
+            if language_code_639_3 in dict_cloner:
+                cloner = dict_cloner[language_code_639_3]
+                bytearray_voice = bytearraysource_voice.load()
+                signal_voice_toclone, sampling_rate_toclone = ToolsAudioIO.bytearray_wav_to_signal(bytearray_voice, mode_preprocessing=True)
+                
+                cloner.clone_voice(signal_voice_toclone)
+                signal_voice_cloned, sampling_rate_cloned = cloner.synthesize(text)
+                
+                bytearray_output = ToolsAudioIO.signal_to_bytearray_wav(signal_voice_cloned, sampling_rate_cloned)
+                bytearraysource_output.save(bytearray_output)
+            else:
+                bytearray_output = ToolsAudioIO.signal_to_bytearray_wav(np.zeros(100), 44100)
+                bytearraysource_output.save(bytearray_output)
