@@ -4,4 +4,5 @@
 docker/notes.txt
 docker/build/model/*
 
-
+breaker_audio.egg-info/*
+*.zip

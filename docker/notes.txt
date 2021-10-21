@@ -7,3 +7,15 @@ RUN apt-get install 'ffmpeg'\
 
 # to skipcache
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+
+
+
+# 
+docker build -t image_service_synthesize -f dockerfile_service_synthesize build
+docker run -t --restart always --name  container_service_synthesize
+docker run -it image_service_synthesize --name container_service_synthesize
+docker exec -it image_service_synthesize /bin/bash
+
+docker run --name container_service_synthesize image_service_synthesize
+docker run -d --name container_service_synthesize image_service_synthesize
+docker save -o image_service_synthesize.tar image_service_synthesize
