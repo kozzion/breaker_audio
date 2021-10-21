@@ -1,2 +1,7 @@
 *.pyc
 *.cfg
+*.tar
+docker/notes.txt
+docker/build/model/*
+
+

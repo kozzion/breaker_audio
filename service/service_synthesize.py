@@ -9,7 +9,7 @@ from pathlib import Path
 import tensorflow as tf
 
 from breaker_core.datasource.jsonqueue import Jsonqueue
-from breaker_core.datasource.bytearraysource import Bytearraysource
+from breaker_core.datasource.bytessource import Bytessource
 
 sys.path.append('..')
 from breaker_audio.voice_cloner import VoiceClonerDefault
@@ -49,20 +49,20 @@ if __name__ == '__main__':
             sys.stdout.flush()
 
             language_code_639_3 = dict_request['language_code_639_3']
-            bytearraysource_voice = Bytearraysource.from_dict(dict_request['bytearraysource_voice'])
+            bytessource_voice = Bytessource.from_dict(dict_request['bytessource_voice'])
             text = dict_request['text']
-            bytearraysource_output = Bytearraysource.from_dict(dict_request['bytearraysource_output'])
+            bytessource_output = Bytessource.from_dict(dict_request['bytessource_output'])
 
             if language_code_639_3 in dict_cloner:
                 cloner = dict_cloner[language_code_639_3]
-                bytearray_voice = bytearraysource_voice.load()
+                bytearray_voice = bytessource_voice.load()
                 signal_voice_toclone, sampling_rate_toclone = ToolsAudioIO.bytearray_wav_to_signal(bytearray_voice, mode_preprocessing=True)
                 
                 cloner.clone_voice(signal_voice_toclone)
                 signal_voice_cloned, sampling_rate_cloned = cloner.synthesize(text)
                 
                 bytearray_output = ToolsAudioIO.signal_to_bytearray_wav(signal_voice_cloned, sampling_rate_cloned)
-                bytearraysource_output.save(bytearray_output)
+                bytessource_output.save(bytearray_output)
             else:
                 bytearray_output = ToolsAudioIO.signal_to_bytearray_wav(np.zeros(100), 44100)
-                bytearraysource_output.save(bytearray_output)
+                bytessource_output.save(bytearray_output)

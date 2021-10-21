@@ -7,9 +7,8 @@ import librosa
 import struct
 import webrtcvad
 
-from breaker_audio.component.encoder.params_data import *
 
-
+from breaker_audio.tools_hparams import ToolsHparams
 
 int16_max = (2 ** 15) - 1
 
@@ -18,6 +17,7 @@ def preprocess_wav(fpath_or_wav: Union[str, Path, np.ndarray],
                    source_sr: Optional[int] = None,
                    normalize: Optional[bool] = True,
                    trim_silence: Optional[bool] = True):
+    dict_hparam = ToolsHparams.hparam_resemblyzer()
     """
     Applies the preprocessing operations used in training the Speaker Encoder to a waveform 
     either on disk or in memory. The waveform will be resampled to match the data hyperparameters.
@@ -36,12 +36,12 @@ def preprocess_wav(fpath_or_wav: Union[str, Path, np.ndarray],
         wav = fpath_or_wav
     
     # Resample the wav if needed
-    if source_sr is not None and source_sr != sampling_rate:
-        wav = librosa.resample(wav, source_sr, sampling_rate)
+    if source_sr is not None and source_sr != dict_hparam['sampling_rate']:
+        wav = librosa.resample(wav, source_sr, dict_hparam['sampling_rate'])
         
     # Apply the preprocessing: normalize volume and shorten long silences 
     if normalize:
-        wav = normalize_volume(wav, audio_norm_target_dBFS, increase_only=True)
+        wav = normalize_volume(wav, dict_hparam['audio_norm_target_dBFS'], increase_only=True)
     if webrtcvad and trim_silence:
         wav = trim_long_silences(wav)
     
@@ -49,6 +49,7 @@ def preprocess_wav(fpath_or_wav: Union[str, Path, np.ndarray],
 
 
 def wav_to_mel_spectrogram(wav):
+    dict_hparam = ToolsHparams.hparam_resemblyzer()
     #MARKER melspec
     """
     Derives a mel spectrogram ready to be used by the encoder from a preprocessed audio waveform.
@@ -56,15 +57,16 @@ def wav_to_mel_spectrogram(wav):
     """
     frames = librosa.feature.melspectrogram(
         wav,
-        sampling_rate,
-        n_fft=int(sampling_rate * mel_window_length / 1000),
-        hop_length=int(sampling_rate * mel_window_step / 1000),
-        n_mels=mel_n_channels
+        dict_hparam['sampling_rate'],
+        n_fft=int(dict_hparam['sampling_rate'] * dict_hparam['mel_window_length'] / 1000),
+        hop_length=int(dict_hparam['sampling_rate'] * dict_hparam['mel_window_step'] / 1000),
+        n_mels=dict_hparam['mel_n_channels']
     )
     return frames.astype(np.float32).T
 
 
 def trim_long_silences(wav):
+    dict_hparam = ToolsHparams.hparam_resemblyzer()
     """
     Ensures that segments without voice in the waveform remain no longer than a 
     threshold determined by the VAD parameters in params.py.
@@ -73,7 +75,7 @@ def trim_long_silences(wav):
     :return: the same waveform with silences trimmed away (length <= original wav length)
     """
     # Compute the voice detection window size
-    samples_per_window = (vad_window_length * sampling_rate) // 1000
+    samples_per_window = (dict_hparam['vad_window_length'] * dict_hparam['sampling_rate']) // 1000
     
     # Trim the end of the audio to have a multiple of the window size
     wav = wav[:len(wav) - (len(wav) % samples_per_window)]
@@ -87,7 +89,7 @@ def trim_long_silences(wav):
     for window_start in range(0, len(wav), samples_per_window):
         window_end = window_start + samples_per_window
         voice_flags.append(vad.is_speech(pcm_wave[window_start * 2:window_end * 2],
-                                         sample_rate=sampling_rate))
+                                         sample_rate=dict_hparam['sampling_rate']))
     voice_flags = np.array(voice_flags)
     
     # Smooth the voice detection with a moving average
@@ -97,11 +99,11 @@ def trim_long_silences(wav):
         ret[width:] = ret[width:] - ret[:-width]
         return ret[width - 1:] / width
     
-    audio_mask = moving_average(voice_flags, vad_moving_average_width)
+    audio_mask = moving_average(voice_flags, dict_hparam['vad_moving_average_width'])
     audio_mask = np.round(audio_mask).astype(np.bool)
     
     # Dilate the voiced regions
-    audio_mask = binary_dilation(audio_mask, np.ones(vad_max_silence_length + 1))
+    audio_mask = binary_dilation(audio_mask, np.ones(dict_hparam['vad_max_silence_length'] + 1))
     audio_mask = np.repeat(audio_mask, samples_per_window)
     
     return wav[audio_mask == True]
