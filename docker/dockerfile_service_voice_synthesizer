@@ -1,0 +1,68 @@
+FROM python:3.7-slim-buster
+
+RUN apt-get update
+RUN apt-get install git -y
+RUN apt-get install libsndfile1 -y 
+RUN apt-get install tk -y
+RUN apt-get install libportaudio2 -y
+RUN apt-get install wget -y
+RUN apt-get install zip -y
+RUN apt-get install gcc -y
+
+RUN pip install --upgrade pip
+
+#ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
+
+# RUN pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow_cpu-2.6.0-cp37-cp37m-manylinux2010_x86_64.whl
+RUN pip3 install https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.15.2-cp37-cp37m-manylinux2010_x86_64.whl
+
+# torch-1.9.1-cp37-cp37m-manylinux1_x86_64.whl
+WORKDIR /code/
+
+#TODO install directly from release tags
+RUN git clone https://github.com/kozzion/breaker_core
+RUN git clone https://github.com/kozzion/breaker_aws
+RUN git clone https://github.com/kozzion/breaker_audio
+
+WORKDIR /code/breaker_core
+RUN git pull
+RUN pip3 install -e .
+
+WORKDIR /code/breaker_audio
+RUN git pull
+RUN pip3 install -e .
+
+WORKDIR /code/breaker_aws
+RUN git pull
+RUN pip3 install -e .
+
+
+WORKDIR /data/data_breaker/model
+
+# get models from public google drive
+RUN pip install gdown
+#chinese models
+RUN gdown https://drive.google.com/uc?id=1NIz4I4eFBgOMI7BsdHaigCB1RTDnJmKO
+RUN unzip audio_cmn_ge2e_pretrained.zip
+
+RUN gdown https://drive.google.com/uc?id=1--SEP5fIi9860Y-5neyi97_I9k8nthev
+RUN unzip audio_cmn_logs_syne.zip
+
+RUN gdown https://drive.google.com/uc?id=1-DsRJxeYLdbmOF9BTG9r3ptmUYUHvsBJ
+RUN unzip audio_cmn_melgan_multi_speaker.zip
+
+#chinese models
+RUN gdown https://drive.google.com/uc?id=1-IQU3C-OSSAozJhC7e0qtL_Y5FgY_nXF
+RUN unzip audio_eng_rtv_pretrained_encoder.zip
+
+RUN gdown https://drive.google.com/uc?id=1-PuD8Sy1FSyXlQYQV768NRCwzZq3jCQ-
+RUN unzip audio_eng_rtv_pretrained_synthesizer.zip
+
+RUN gdown https://drive.google.com/uc?id=1-TcLCzOj1GX48KUUncD--jPyPjum2R3O
+RUN unzip audio_eng_rtv_pretrained_vocoder.zip
+
+
+# copy config
+WORKDIR /code/breaker_audio/service
+COPY config.cfg config.cfg
+CMD [ "python3", "service_voice_synthesizer.py"]

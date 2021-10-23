@@ -54,11 +54,11 @@ class VoiceAuthenticator(object):
 
         # select the upper triangle of the covariance matrix (excluding the diagonal)
         list_val_b_b = (array_encoding_b @ array_encoding_b.transpose())[np.triu_indices(len(list_encoding_b), k = 1)].tolist()
-        print(type(list_val_b_b[0]))
         # just iterate over the lis for the second one
         list_val_a_b = np.array([encoding_a @ encoding_b for encoding_b in list_encoding_b]).tolist()
-        print(type(list_val_a_b[0]))
-        std = np.mean([np.std(list_val_b_b), np.std(list_val_a_b)])
+        sdev_a = np.std(list_val_a_b)
+        sdev_b = np.std(list_val_b_b)
+        std = np.mean([sdev_a, sdev_b])
         #TODO we can do a proper test here
         z = np.abs(np.mean(list_val_b_b) - np.mean(list_val_a_b)) / std
         

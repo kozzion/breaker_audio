@@ -11,7 +11,7 @@ ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 
 # 
-docker build -t image_service_synthesize -f dockerfile_service_synthesize build
+docker build -t image_service_voice_synthesizer -f dockerfile_service_voice_synthesizer build
 docker run -t --restart always --name  container_service_synthesize
 docker run -it image_service_synthesize --name container_service_synthesize
 docker exec -it image_service_synthesize /bin/bash
