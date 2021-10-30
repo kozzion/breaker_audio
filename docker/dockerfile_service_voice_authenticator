@@ -76,4 +76,4 @@ RUN git pull
 # copy config
 WORKDIR /code/breaker_audio/service
 COPY config.cfg config.cfg
-CMD [ "python3", "service_voice_synthesizer.py"]
+CMD [ "python3", "service_voice_authenticator.py"]
