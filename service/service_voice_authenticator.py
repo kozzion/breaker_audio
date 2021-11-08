@@ -15,8 +15,8 @@ from breaker_audio.tools_audio_io import ToolsAudioIO
 
 class ServiceVoiceAuthenticator(ServiceJsonqueue):
 
-    def __init__(self, queue_request, mode_debug, path_dir_data) -> None:
-        super().__init__(queue_request, mode_debug)
+    def __init__(self, config_breaker, queue_request, mode_debug, path_dir_data) -> None:
+        super().__init__(config_breaker, queue_request, mode_debug)
         self.path_dir_data = path_dir_data
         self.authenticator = VoiceAuthenticator(path_dir_data)
         
@@ -24,8 +24,8 @@ class ServiceVoiceAuthenticator(ServiceJsonqueue):
         type_request = request['type_request']
         if type_request == 'encode':
             print('encode')
-            bytessource_sound = Bytessource.from_dict(request['bytessource_voice_sound'])
-            bytessource_encoding = Bytessource.from_dict(request['bytessource_voice_encoding'])
+            bytessource_sound = Bytessource.from_dict(self.config_breaker, request['bytessource_voice_sound'])
+            bytessource_encoding = Bytessource.from_dict(self.config_breaker, request['bytessource_voice_encoding'])
 
             signal_voice, sampling_rate_voice = ToolsAudioIO.bytearray_wav_to_signal(bytessource_sound.read())
             array_encoding = self.authenticator.encode(signal_voice, sampling_rate_voice)
@@ -34,8 +34,8 @@ class ServiceVoiceAuthenticator(ServiceJsonqueue):
 
         elif type_request == 'authenticate':
             print('authenticate')
-            bytessource_sound = Bytessource.from_dict(request['bytessource_voice_sound'])
-            bytessource_encoding_dir = Bytessource.from_dict(request['bytessource_voice_encoding_dir'])
+            bytessource_sound = Bytessource.from_dict(self.config_breaker, request['bytessource_voice_sound'])
+            bytessource_encoding_dir = Bytessource.from_dict(self.config_breaker, request['bytessource_voice_encoding_dir'])
             
             signal_voice, sampling_rate_voice = ToolsAudioIO.bytearray_wav_to_signal(bytessource_sound.read())
             encoding_a = self.authenticator.encode(signal_voice, sampling_rate_voice)
@@ -56,14 +56,14 @@ if __name__ == '__main__':
     mode_debug = True
 
     with open(path_file_config_breaker, 'r') as file:
-        dict_config = json.load(file)
+        config_breaker = json.load(file)
 
 
-    jsonqueue_request = Jsonqueue.from_dict(dict_config['queue_request_voice_authenticator'])
+    jsonqueue_request = Jsonqueue.from_dict(config_breaker, config_breaker['queue_request_voice_authenticator'])
     if not jsonqueue_request.exists():
         jsonqueue_request.create()
 
-    service = ServiceVoiceAuthenticator(jsonqueue_request, mode_debug, path_dir_data)  
+    service = ServiceVoiceAuthenticator(config_breaker, jsonqueue_request, mode_debug, path_dir_data)  
     service.run()
 
     

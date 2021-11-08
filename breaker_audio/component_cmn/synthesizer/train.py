@@ -20,7 +20,7 @@ from breaker_audio.component_cmn.synthesizer import infolog
 
 def add_embedding_stats(summary_writer, embedding_names, paths_to_meta, checkpoint_path):
     # Create tensorboard projector
-    config = tf.contrib.tensorboard.plugins.projector.ProjectorConfig()
+    config = tf.contrib.tensorboard.from breaker_face.faceswap.plugins.projector.ProjectorConfig()
     config.model_checkpoint_path = checkpoint_path
 
     for embedding_name, path_to_meta in zip(embedding_names, paths_to_meta):
@@ -31,7 +31,7 @@ def add_embedding_stats(summary_writer, embedding_names, paths_to_meta, checkpoi
         embedding.metadata_path = path_to_meta
 
     # Project the embeddings to space dimensions for visualization
-    tf.contrib.tensorboard.plugins.projector.visualize_embeddings(summary_writer, config)
+    tf.contrib.tensorboard.from breaker_face.faceswap.plugins.projector.visualize_embeddings(summary_writer, config)
 
 
 def add_train_stats(model, hparams):

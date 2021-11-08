@@ -16,8 +16,8 @@ from breaker_audio.tools_audio_io import ToolsAudioIO
 class ServiceVoiceSynthesizer(ServiceJsonqueue):
 
 
-    def __init__(self, queue_request, mode_debug, path_dir_data) -> None:
-        super().__init__(queue_request, mode_debug)
+    def __init__(self, config_breaker:dict, queue_request, mode_debug, path_dir_data) -> None:
+        super().__init__(config_breaker, queue_request, mode_debug)
         self.path_dir_data = path_dir_data
         
         config = tf.compat.v1.ConfigProto()
@@ -35,9 +35,9 @@ class ServiceVoiceSynthesizer(ServiceJsonqueue):
             sys.stdout.flush()
 
             language_code_639_3 = request['language_code_639_3']
-            bytessource_voice = Bytessource.from_dict(request['bytessource_voice'])
+            bytessource_voice = Bytessource.from_dict(self.config_breaker, request['bytessource_voice'])
             text = request['text']
-            bytessource_output = Bytessource.from_dict(request['bytessource_output'])
+            bytessource_output = Bytessource.from_dict(self.config_breaker, request['bytessource_output'])
 
             if not language_code_639_3 in self.dict_cloner:
                 return {
@@ -66,10 +66,10 @@ if __name__ == '__main__':
     mode_debug = True
 
     with open(path_file_config_breaker, 'r') as file:
-        dict_config = json.load(file)
+        config_breaker = json.load(file)
 
 
-    jsonqueue_request = Jsonqueue.from_dict(dict_config['queue_request_voice_synthesizer'])
+    jsonqueue_request = Jsonqueue.from_dict(config_breaker, config_breaker['queue_request_voice_synthesizer'])
     if not jsonqueue_request.exists():
         jsonqueue_request.create()
 
