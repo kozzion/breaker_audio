@@ -51,7 +51,7 @@ class ServiceVoiceAuthenticator(ServiceJsonqueue):
 
 
 if __name__ == '__main__':
-    path_file_config_breaker = Path(os.getenv('PATH_FILE_CONFIG_BREAKER', 'config.cfg'))
+    path_file_config_breaker = Path(os.getenv('PATH_FILE_CONFIG_BREAKER', '/config/config.cfg'))
     path_dir_data =  Path(os.getenv('PATH_DIR_DATA_BREAKER', '/data/data_breaker/' ))
     mode_debug = True
 
