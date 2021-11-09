@@ -20,9 +20,9 @@ class ServiceVoiceSynthesizer(ServiceJsonqueue):
         super().__init__(config_breaker, queue_request, mode_debug)
         self.path_dir_data = path_dir_data
         
-        config = tf.compat.v1.ConfigProto()
-        config.gpu_options.allow_growth = True
-        sess = tf.compat.v1.Session(config=config)
+        config_tensorflow = tf.compat.v1.ConfigProto()
+        config_tensorflow.gpu_options.allow_growth = True
+        sess = tf.compat.v1.Session(config=config_tensorflow)
 
         self.dict_cloner = {}
         self.dict_cloner['eng'] = VoiceClonerDefault(path_dir_data, 'eng')
@@ -73,5 +73,5 @@ if __name__ == '__main__':
     if not jsonqueue_request.exists():
         jsonqueue_request.create()
 
-    service = ServiceVoiceSynthesizer(jsonqueue_request, mode_debug, path_dir_data)  
+    service = ServiceVoiceSynthesizer(config_breaker, jsonqueue_request, mode_debug, path_dir_data)  
     service.run()

@@ -58,6 +58,10 @@ RUN unzip audio_eng_rtv_pretrained_synthesizer.zip
 RUN gdown https://drive.google.com/uc?id=1-TcLCzOj1GX48KUUncD--jPyPjum2R3O
 RUN unzip audio_eng_rtv_pretrained_vocoder.zip
 
+# resemblizer
+RUN gdown https://drive.google.com/uc?id=1-cEktHF-CzGoevst-PQJCxrFSBXcmEQh
+RUN unzip audio_eng_resemblyzer.zip
+
 ADD "https://www.random.org/cgi-bin/randbyte?nbytes=10&format=h" skipcache
 
 #This is also very dev-y
